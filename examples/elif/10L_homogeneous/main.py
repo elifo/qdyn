@@ -1,5 +1,8 @@
-
-
+### 10Lnuc homogeneous model of Idini & Ampuero paper ###
+### modified for Python wrapper after B.Idini's files ###
+###
+### Elif (06/2023) github@elifo ###
+###
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -24,8 +27,8 @@ p = qdyn()
 
 # Predefine parameters
 t_yr = 3600.0* 24.0* 365.0    # seconds per year
-Lasp = 10                     # Length of asperity / nucleation length
-L = 4                         # Length of fault / nucleation length
+Lasp = 10                     # Length of asperity (VW) / nucleation length
+L = 4                         # Length of model / Lasp
 a = 0.014
 b = 0.019
 resolution = 5                # Mesh resolution / process zone width
@@ -92,10 +95,7 @@ p.render_mesh()
 
 """ Step 3: override default mesh values """
 # Distribute direct effect a over mesh according to some arbitrary function
-# cab_ratio = 0.2
-# p.mesh_dict["A"] = set_dict["SET_DICT_RSF"]["B"] * (1 + cab_ratio*(1 - 2*np.exp(-(2*x/Lasp)**6)))
-
-# outside VW patch, set a = (3b-a)
+# outside VW patch, set a = (3b-a) after benjamin's
 cdt = (abs(x) > Lasp/ 2.0)
 p.mesh_dict["A"][cdt] = 3.0* p.mesh_dict["B"][cdt]- a
 print (p.mesh_dict["A"][cdt])
