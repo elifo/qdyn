@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#Submit this script with: sbatch thefilename
+
+#SBATCH --time=48:00:00   # walltime
+#SBATCH --ntasks=1   # number of processor cores (i.e. tasks)
+#SBATCH --mem-per-cpu=50G   # memory per CPU core
+#SBATCH -J "40Lhomo_chunk"   # job name
+##SBATCH --mail-user=elifo@caltech.edu
+
+
+# LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
+module load python3/3.8.5
+
+# SWITCH TO VIRTUAL ENV
+source  /central/groups/enceladus/ELIF/python-environments/my-test-venv/bin/activate
+
+# modify PATH to qdyn in main.py
+python -u split_ox_chunks2.py > out_chunking.log
