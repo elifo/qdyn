@@ -172,7 +172,8 @@ def animation_slip(ox, warm_up=0, orientation="horizontal"):
     plt.close()
     return anim
 
-def plot_2D_slip_rate(ox, t_beg=None,t_end=None,V_pl=1e-9,Lvw=5,Lc=None):
+def plot_2D_slip_rate(ox, t_beg=None,t_end=None,V_pl=1e-9,Lvw=5,Lc=None,normalize=True,
+                              cmap='RdBu_r',vmin=None,vmax=None,is_log=True):
 
     x_unique = ox["x"].unique()
     sort_inds = np.argsort(x_unique)
@@ -191,21 +192,27 @@ def plot_2D_slip_rate(ox, t_beg=None,t_end=None,V_pl=1e-9,Lvw=5,Lc=None):
     x = ox["x"][slice].values.reshape(data_shape)[:, sort_inds]
     v = ox["v"][slice].values.reshape(data_shape)[:, sort_inds]
     t = ox["t"][slice].values.reshape(data_shape)[:, sort_inds]
-
     print (x.shape, v.shape, t.shape)
     x /= Lc
     t -= t[0]
     t /= t_year
-    v /= V_pl
+    if normalize: v /= V_pl
+
+    data = v
+    if is_log: data = np.log10(v)
+    if vmin==None: vmin= data.min()
+    if vmax==None: vmax= data.max()
+    print ('vmin, vmax: ', vmin, vmax)
 
     fig = plt.figure(figsize=(8, 4))
     ext = [np.amin(t), np.amax(t), np.amin(x), np.amax(x)]
-    im = plt.imshow(np.log10(v.T), extent=ext, aspect='auto',cmap=plt.cm.get_cmap('RdBu_r', 31))
+    im = plt.imshow(data.T, extent=ext, aspect='auto',cmap=plt.cm.get_cmap(cmap,31),vmin=vmin,vmax=vmax)
     plt.xlabel("Time since warm up (yr)")
     plt.ylabel("Along fault (Lnuc)")
     plt.axhline(Lvw, c='snow',lw=0.5, ls=':')
     plt.axhline(-Lvw, c='snow',lw=0.5, ls=':')
     plt.ylim(-Lvw*1.5, Lvw*1.5)
-    plt.colorbar(im, shrink=0.7, label='Slip rate, log10(V/V_pl)')
+    if normalize: plt.colorbar(im, shrink=0.7, label='Slip rate, log10(V/V_pl)')
+    if not normalize: plt.colorbar(im, shrink=0.7, label='Slip rate, V (m/s)')
     plt.title("Warm up (yr) = " + str(t_beg/t_year))
 ###
